@@ -12,15 +12,30 @@ export default async function LoginPage() {
     )
   }
 
-  // Check if user is already logged in
-  const supabase = createClient()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  try {
+    // Check if user is already logged in
+    const supabase = createClient()
 
-  // If user is logged in, redirect to dashboard
-  if (session) {
-    redirect("/dashboard")
+    if (!supabase) {
+      console.error("Failed to create Supabase client")
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
+          <LoginForm />
+        </div>
+      )
+    }
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    // If user is logged in, redirect to dashboard
+    if (session) {
+      redirect("/dashboard")
+    }
+  } catch (error) {
+    console.error("Error checking session:", error)
+    // Continue to show login form even if session check fails
   }
 
   return (
