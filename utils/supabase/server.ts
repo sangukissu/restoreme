@@ -10,8 +10,6 @@ export const isSupabaseConfigured =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.length > 0
 
 export const createClient = cache(() => {
-  const cookieStore = cookies()
-
   if (!isSupabaseConfigured) {
     console.warn("Supabase environment variables are not set. Using dummy client.")
     return {
@@ -22,12 +20,31 @@ export const createClient = cache(() => {
     }
   }
 
+  let cookieStore
+  try {
+    cookieStore = cookies()
+  } catch (error) {
+    console.warn("Failed to access cookies:", error)
+    cookieStore = null
+  }
+
   return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
       getAll() {
-        return cookieStore.getAll()
+        if (!cookieStore) {
+          return []
+        }
+        try {
+          return cookieStore.getAll()
+        } catch (error) {
+          console.warn("Failed to get cookies:", error)
+          return []
+        }
       },
       setAll(cookiesToSet) {
+        if (!cookieStore) {
+          return
+        }
         try {
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         } catch {
