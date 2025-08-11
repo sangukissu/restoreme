@@ -5,31 +5,7 @@ import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Loader2, Mail } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { signIn, signInWithMagicLink, signInWithGoogle } from "@/lib/actions"
-
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button
-      type="submit"
-      disabled={pending}
-      className="w-full bg-black hover:bg-gray-800 text-white py-3 text-base font-medium rounded-lg h-12"
-    >
-      {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Signing in...
-        </>
-      ) : (
-        "Sign In"
-      )}
-    </Button>
-  )
-}
+import { signInWithMagicLink, signInWithGoogle } from "@/app/login/actions"
 
 function MagicLinkButton() {
   const { pending } = useFormStatus()
@@ -38,8 +14,7 @@ function MagicLinkButton() {
     <Button
       type="submit"
       disabled={pending}
-      variant="outline"
-      className="w-full border-gray-300 hover:bg-gray-50 text-black py-3 text-base font-medium rounded-lg h-12 bg-transparent"
+      className="w-full bg-black hover:bg-gray-800 text-white py-3 text-base font-medium rounded-lg h-12"
     >
       {pending ? (
         <>
@@ -57,17 +32,7 @@ function MagicLinkButton() {
 }
 
 export default function LoginForm() {
-  const router = useRouter()
-  const [state, formAction] = useActionState(signIn, null)
   const [magicLinkState, magicLinkAction] = useActionState(signInWithMagicLink, null)
-  const [showMagicLink, setShowMagicLink] = useState(false)
-
-  // Handle successful login by redirecting
-  useEffect(() => {
-    if (state?.success) {
-      router.push("/dashboard")
-    }
-  }, [state, router])
 
   const handleGoogleSignIn = async () => {
     try {
@@ -80,80 +45,40 @@ export default function LoginForm() {
   return (
     <div className="w-full max-w-md space-y-8">
       <div className="space-y-2 text-center">
-        <h1 className="text-4xl font-semibold tracking-tight text-black">Welcome back</h1>
-        <p className="text-lg text-gray-600">Sign in to Restore.me</p>
+        <h1 className="text-4xl font-semibold tracking-tight text-black">Welcome to Restore.me</h1>
+        <p className="text-lg text-gray-600">Sign in or create an account to restore your images</p>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-        {!showMagicLink ? (
-          <form action={formAction} className="space-y-6">
-            {state?.error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {state.error}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-900">
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  required
-                  className="bg-white border-gray-300 text-black placeholder:text-gray-500 rounded-lg h-12"
-                />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-900">
-                  Password
-                </label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="bg-white border-gray-300 text-black rounded-lg h-12"
-                />
-              </div>
+        <form action={magicLinkAction} className="space-y-6">
+          {magicLinkState?.error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {magicLinkState.error}
             </div>
+          )}
 
-            <SubmitButton />
-          </form>
-        ) : (
-          <form action={magicLinkAction} className="space-y-6">
-            {magicLinkState?.error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {magicLinkState.error}
-              </div>
-            )}
-
-            {magicLinkState?.success && (
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-                {magicLinkState.success}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-900">
-                Email
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-                className="bg-white border-gray-300 text-black placeholder:text-gray-500 rounded-lg h-12"
-              />
+          {magicLinkState?.success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+              {magicLinkState.success}
             </div>
+          )}
 
-            <MagicLinkButton />
-          </form>
-        )}
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+              Email
+            </label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              className="bg-white border-gray-300 text-black placeholder:text-gray-500 rounded-lg h-12"
+            />
+          </div>
+
+          <MagicLinkButton />
+        </form>
 
         <div className="mt-6 space-y-4">
           <div className="relative">
@@ -190,21 +115,6 @@ export default function LoginForm() {
             </svg>
             Continue with Google
           </Button>
-
-          <Button
-            onClick={() => setShowMagicLink(!showMagicLink)}
-            variant="ghost"
-            className="w-full text-gray-600 hover:text-black py-3 text-base font-medium rounded-lg h-12"
-          >
-            {showMagicLink ? "Back to password login" : "Use magic link instead"}
-          </Button>
-        </div>
-
-        <div className="mt-6 text-center text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/auth/sign-up" className="text-black hover:underline font-medium">
-            Sign up
-          </Link>
         </div>
       </div>
     </div>

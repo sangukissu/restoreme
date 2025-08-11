@@ -6,7 +6,7 @@ import ImageUpload from "@/components/image-upload"
 import ImageComparison from "@/components/image-comparison"
 import PaymentModal from "@/components/payment-modal"
 import { restoreImage, type RestoreImageResponse } from "@/lib/api-client"
-import { signOut } from "@/lib/actions"
+import { signOut } from "@/app/login/actions" // Updated import to use app/login/actions instead of lib/actions
 
 type AppState = "upload" | "loading" | "comparison" | "error"
 

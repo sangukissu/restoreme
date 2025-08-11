@@ -4,48 +4,6 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
 
-export async function signIn(formData: FormData) {
-  const supabase = await createClient()
-
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
-
-  if (error) {
-    redirect("/auth/login?error=Invalid credentials")
-  }
-
-  revalidatePath("/", "layout")
-  redirect("/dashboard")
-}
-
-export async function signUp(formData: FormData) {
-  const supabase = await createClient()
-
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  }
-
-  const { error } = await supabase.auth.signUp({
-    ...data,
-    options: {
-      emailRedirectTo:
-        process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-    },
-  })
-
-  if (error) {
-    redirect("/auth/sign-up?error=Could not create account")
-  }
-
-  revalidatePath("/", "layout")
-  redirect("/auth/sign-up?message=Check your email to continue sign in process")
-}
-
 export async function signInWithMagicLink(formData: FormData) {
   const supabase = await createClient()
 
@@ -100,6 +58,7 @@ export async function signOut() {
   redirect("/")
 }
 
-// Legacy function names for backward compatibility
-export const login = signIn
-export const signup = signUp
+export const signIn = signInWithMagicLink
+export const signUp = signInWithMagicLink
+export const login = signInWithMagicLink
+export const signup = signInWithMagicLink

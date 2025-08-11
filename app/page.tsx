@@ -29,7 +29,7 @@ export default async function LandingPage() {
             brings your precious memories back to life with professional-grade results in seconds.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/auth/sign-up">
+            <Link href="/auth/login">
               <Button size="lg" className="bg-black text-white hover:bg-gray-800 px-8 py-3 text-lg rounded-xl">
                 Start Restoring
               </Button>
@@ -99,7 +99,7 @@ export default async function LandingPage() {
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Join thousands of users who have already transformed their old photos into beautiful memories.
           </p>
-          <Link href="/auth/sign-up">
+          <Link href="/auth/login">
             <Button size="lg" className="bg-black text-white hover:bg-gray-800 px-8 py-3 text-lg rounded-xl">
               Get Started Now
             </Button>

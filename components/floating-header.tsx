@@ -38,7 +38,7 @@ export default function FloatingHeader() {
                   Sign In
                 </Button>
               </Link>
-              <Link href="/auth/sign-up">
+              <Link href="/auth/login">
                 <Button className="bg-black text-white hover:bg-gray-800 rounded-xl px-6 py-2 shadow-sm hover:shadow-md transition-all">
                   Get Started
                 </Button>

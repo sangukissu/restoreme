@@ -4,10 +4,10 @@ export interface RestoreImageResponse {
   error?: string
 }
 
-export async function restoreImage(imageFile: File): Promise<RestoreImageResponse> {
+export async function restoreImage(file: File): Promise<RestoreImageResponse> {
   try {
     const formData = new FormData()
-    formData.append("image", imageFile)
+    formData.append("image", file)
 
     const response = await fetch("/api/restore", {
       method: "POST",
