@@ -40,24 +40,13 @@ export async function updateSession(request: NextRequest) {
   )
 
   const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get("code")
-
-  if (code) {
-    // Exchange the code for a session
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      // Redirect to dashboard after successful auth
-      const url = request.nextUrl.clone()
-      url.pathname = "/dashboard"
-      url.searchParams.delete("code") // Remove code from URL
-      return NextResponse.redirect(url)
-    } else {
-      // Redirect to login with error if code exchange fails
-      const url = request.nextUrl.clone()
-      url.pathname = "/auth/login"
-      url.searchParams.set("error", "Authentication failed")
-      return NextResponse.redirect(url)
-    }
+  if (requestUrl.pathname === "/auth/callback") {
+    // For auth callbacks, just redirect to dashboard and let Supabase handle the session
+    const url = request.nextUrl.clone()
+    url.pathname = "/dashboard"
+    // Clear all query parameters to avoid issues
+    url.search = ""
+    return NextResponse.redirect(url)
   }
 
   // IMPORTANT: Avoid writing any logic between createServerClient and
