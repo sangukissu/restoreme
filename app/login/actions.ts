@@ -4,18 +4,18 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
 
-export async function signInWithMagicLink(formData: FormData) {
+export async function signInWithMagicLink(prevState: any, formData: FormData) {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
 
-    if (!supabase) {
-      redirect("/auth/login?error=Authentication service unavailable")
+    if (!supabase || !supabase.auth) {
+      return { error: "Authentication service unavailable" }
     }
 
     const email = formData.get("email") as string
 
     if (!email) {
-      redirect("/auth/login?error=Email is required")
+      return { error: "Email is required" }
     }
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -26,26 +26,24 @@ export async function signInWithMagicLink(formData: FormData) {
     })
 
     if (error) {
-      redirect("/auth/login?error=Could not send magic link")
+      return { error: "Could not send magic link. Please try again." }
     }
 
-    revalidatePath("/", "layout")
-    redirect("/auth/login?message=Check your email for the magic link")
+    return { success: "Check your email for the magic link!" }
   } catch (error) {
     console.error("Magic link error:", error)
-    redirect("/auth/login?error=Authentication failed")
+    return { error: "Authentication failed. Please try again." }
   }
 }
 
 export async function signInWithGoogle() {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
 
-    if (!supabase) {
+    if (!supabase || !supabase.auth) {
       redirect("/auth/login?error=Authentication service unavailable")
     }
 
-    // Fixed redirect URL and return handling for Google OAuth
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -68,9 +66,9 @@ export async function signInWithGoogle() {
 
 export async function signOut() {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
 
-    if (!supabase) {
+    if (!supabase || !supabase.auth) {
       redirect("/error")
     }
 
@@ -88,6 +86,7 @@ export async function signOut() {
   }
 }
 
+// Legacy exports for backward compatibility
 export const signIn = signInWithMagicLink
 export const signUp = signInWithMagicLink
 export const login = signInWithMagicLink
